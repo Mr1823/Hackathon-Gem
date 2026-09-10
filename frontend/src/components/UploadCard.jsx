@@ -59,7 +59,7 @@ export function UploadCard({ label, description, icon, accept = '.pdf', onFileSe
       ) : (
         /* Empty state */
         <div>
-          <div style={{ width: 56, height: 56, margin: '0 auto 12px', background: 'rgba(30,41,59,0.8)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>
+          <div style={{ width: 56, height: 56, margin: '0 auto 12px', background: 'rgba(30,41,59,0.8)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {icon}
           </div>
           <p style={{ color: '#e2e8f0', fontWeight: 600, fontSize: '0.95rem', marginBottom: 4 }}>

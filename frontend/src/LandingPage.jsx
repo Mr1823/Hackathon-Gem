@@ -2,22 +2,22 @@ import { useEffect, useRef, useState } from 'react';
 
 const FEATURES = [
   {
-    icon: '🔍',
+    icon: <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke="#818CF8" strokeWidth="2"/><path d="M21 21l-4.35-4.35" stroke="#818CF8" strokeWidth="2" strokeLinecap="round"/></svg>,
     title: 'Evidence-Backed Verdicts',
     desc: 'Every compliance decision is anchored to a verbatim quote from the bid — not a black-box score. Officers see exactly what the AI read.',
   },
   {
-    icon: '📊',
+    icon: <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6" stroke="#818CF8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>,
     title: 'Clause-by-Clause Audit Trail',
     desc: 'Each eligibility criterion is evaluated independently. The full checklist becomes your legally defensible audit log.',
   },
   {
-    icon: '📥',
+    icon: <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="#818CF8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>,
     title: 'Exportable PDF Report',
     desc: 'One-click export to a formatted compliance report ready for tender files, dispute resolution, or vendor feedback.',
   },
   {
-    icon: '⚡',
+    icon: <svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="#818CF8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>,
     title: '2-Minute Turnaround',
     desc: 'What takes a procurement officer 3–4 hours of reading is done in under 2 minutes — across all criteria, simultaneously.',
   },
@@ -26,19 +26,19 @@ const FEATURES = [
 const STEPS = [
   {
     n: 1,
-    icon: '📄',
+    icon: <svg width="26" height="26" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>,
     title: 'Upload Tender / RFP',
     desc: 'Drop your GeM tender PDF. The AI parses all eligibility criteria — financial thresholds, certifications, experience requirements — into a structured checklist.',
   },
   {
     n: 2,
-    icon: '📋',
+    icon: <svg width="26" height="26" fill="none" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><rect x="8" y="2" width="8" height="4" rx="1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>,
     title: 'Upload Vendor Bid',
     desc: 'Add the vendor\'s bid document. The AI evaluates each criterion against the bid content, extracting verbatim evidence or flagging gaps.',
   },
   {
     n: 3,
-    icon: '✅',
+    icon: <svg width="26" height="26" fill="none" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>,
     title: 'Get Compliance Report',
     desc: 'Receive a colour-coded audit table with verdicts, confidence scores, and AI reasoning — ready to export as a PDF report.',
   },
@@ -103,7 +103,7 @@ export default function LandingPage({ onStart }) {
               fontSize: '1.2rem',
               boxShadow: '0 0 20px rgba(79,70,229,0.45)',
               flexShrink: 0,
-            }}>⚖️</div>
+            }}><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 3v18M3 7l9-4 9 4M5 7v4a7 7 0 0 0 4.5 6.5M19 7v4a7 7 0 0 1-4.5 6.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ color: '#f1f5f9', fontWeight: 800, fontSize: '1rem', letterSpacing: '-0.01em' }}>GeM BidVerify</span>
@@ -137,7 +137,7 @@ export default function LandingPage({ onStart }) {
             fontSize: '0.78rem', color: '#a5b4fc', fontWeight: 600,
             marginBottom: 28, boxShadow: '0 0 20px rgba(79,70,229,0.15)',
           }}>
-            🚀 AI-Powered · Built for GeM Procurement Officers
+            AI-Powered · Built for GeM Procurement Officers
           </div>
 
           <h1 style={{
@@ -162,7 +162,7 @@ export default function LandingPage({ onStart }) {
 
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 52 }}>
             <button onClick={onStart} className="btn-primary" style={{ padding: '14px 32px', fontSize: '1rem', borderRadius: 14 }} id="hero-cta">
-              ⚡ Start Verification — It's Free
+              Start Verification — It's Free
             </button>
             <a href="#how-it-works" className="btn-secondary" style={{ padding: '14px 28px', fontSize: '1rem', borderRadius: 14, textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
               See How It Works ↓
@@ -171,11 +171,11 @@ export default function LandingPage({ onStart }) {
 
           <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
             {[
-              { icon: '⚡', label: '2-min analysis' },
-              { icon: '🔍', label: 'Evidence-backed verdicts' },
-              { icon: '📊', label: 'Clause-by-clause audit' },
-              { icon: '📥', label: 'Exportable PDF report' },
-              { icon: '🔒', label: 'No data stored' },
+              { icon: <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, label: '2-min analysis' },
+              { icon: <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke="#94a3b8" strokeWidth="2"/><path d="M21 21l-4.35-4.35" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round"/></svg>, label: 'Evidence-backed verdicts' },
+              { icon: <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, label: 'Clause-by-clause audit' },
+              { icon: <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, label: 'Exportable PDF report' },
+              { icon: <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#94a3b8" strokeWidth="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, label: 'No data stored' },
             ].map((f) => (
               <div key={f.label} style={{ background: 'rgba(30,41,59,0.7)', border: '1px solid rgba(51,65,85,0.6)', borderRadius: 9999, padding: '7px 16px', fontSize: '0.8rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 7, backdropFilter: 'blur(8px)' }}>
                 {f.icon} {f.label}
@@ -204,7 +204,7 @@ export default function LandingPage({ onStart }) {
                   onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}
                 >
                   <div aria-hidden style={{ position: 'absolute', top: 16, right: 20, fontSize: '5rem', fontWeight: 900, color: 'rgba(79,70,229,0.07)', lineHeight: 1, fontFamily: "'Plus Jakarta Sans', sans-serif", userSelect: 'none' }}>{step.n}</div>
-                  <div style={{ width: 56, height: 56, borderRadius: 16, background: 'linear-gradient(135deg, rgba(79,70,229,0.2), rgba(124,58,237,0.15))', border: '1px solid rgba(79,70,229,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.6rem', marginBottom: 20, boxShadow: '0 0 20px rgba(79,70,229,0.15)' }}>{step.icon}</div>
+                  <div style={{ width: 56, height: 56, borderRadius: 16, background: 'linear-gradient(135deg, rgba(79,70,229,0.2), rgba(124,58,237,0.15))', border: '1px solid rgba(79,70,229,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20, boxShadow: '0 0 20px rgba(79,70,229,0.15)', color: '#a5b4fc' }}>{step.icon}</div>
                   <div style={{ marginBottom: 10 }}>
                     <span style={{ background: 'rgba(79,70,229,0.2)', border: '1px solid rgba(79,70,229,0.35)', color: '#818cf8', fontSize: '0.65rem', padding: '2px 8px', borderRadius: 6, fontWeight: 700, letterSpacing: '0.06em' }}>STEP {step.n}</span>
                   </div>
@@ -234,7 +234,7 @@ export default function LandingPage({ onStart }) {
                   onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,0,0,0.4), 0 0 24px rgba(79,70,229,0.08)'; }}
                   onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}
                 >
-                  <div style={{ fontSize: '2rem', marginBottom: 16 }}>{f.icon}</div>
+                  <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>{f.icon}</div>
                   <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#e2e8f0', fontWeight: 700, fontSize: '1rem', marginBottom: 10 }}>{f.title}</h3>
                   <p style={{ color: '#64748b', fontSize: '0.85rem', lineHeight: 1.7, margin: 0 }}>{f.desc}</p>
                 </div>

@@ -192,7 +192,7 @@ export function ComplianceTable({ criteria, results }) {
                     {/* Requirement */}
                     <div>
                       <p style={{ color: '#64748b', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
-                        📋 Requirement
+                        REQUIREMENT
                       </p>
                       <div style={{
                         background: 'rgba(30,41,59,0.6)',
@@ -210,7 +210,7 @@ export function ComplianceTable({ criteria, results }) {
                     {/* Evidence */}
                     <div>
                       <p style={{ color: '#64748b', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
-                        🔍 Evidence Found in Bid
+                        EVIDENCE FOUND IN BID
                       </p>
                       <div style={{
                         background: row.evidence ? 'rgba(79,70,229,0.08)' : 'rgba(30,41,59,0.4)',

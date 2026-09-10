@@ -11,9 +11,9 @@ const CATEGORY_ICONS = {
   Financial: '₹',
   Technical: '⚙',
   Legal: '⚖',
-  Certification: '🏅',
-  Experience: '📋',
-  Other: '📌',
+  Certification: '★',
+  Experience: '○',
+  Other: '●',
 };
 
 export function CriteriaPanel({ criteria }) {
@@ -61,7 +61,7 @@ export function CriteriaPanel({ criteria }) {
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
                 <span style={{ color: '#e2e8f0', fontWeight: 600, fontSize: '0.875rem' }}>
-                  {CATEGORY_ICONS[c.category] || '📌'} {c.criterion}
+                  {CATEGORY_ICONS[c.category] || '●'} {c.criterion}
                 </span>
                 <span className={`category-pill ${CATEGORY_CLASSES[c.category] || 'cat-other'}`}>
                   {c.category}

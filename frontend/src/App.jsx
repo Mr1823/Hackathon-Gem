@@ -8,10 +8,15 @@ import { ExportButton } from './components/ExportButton';
 
 // ── Step Indicator ────────────────────────────────────────────────────────────
 function StepIndicator({ step }) {
+  const icons = {
+    1: <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+    2: <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><rect x="8" y="2" width="8" height="4" rx="1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+    3: <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  };
   const steps = [
-    { n: 1, label: 'Upload Tender', icon: '📄' },
-    { n: 2, label: 'Upload Bid', icon: '📋' },
-    { n: 3, label: 'Results', icon: '✅' },
+    { n: 1, label: 'Upload Tender' },
+    { n: 2, label: 'Upload Bid' },
+    { n: 3, label: 'Results' },
   ];
 
   return (
@@ -26,7 +31,7 @@ function StepIndicator({ step }) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: step > s.n ? '0.9rem' : '1.1rem',
+              fontSize: '1rem',
               fontWeight: 800,
               background: step > s.n
                 ? 'linear-gradient(135deg, #10B981, #059669)'
@@ -42,7 +47,7 @@ function StepIndicator({ step }) {
               transition: 'all 0.4s ease',
               boxShadow: step === s.n ? '0 0 20px rgba(79,70,229,0.4)' : step > s.n ? '0 0 16px rgba(16,185,129,0.3)' : 'none',
             }}>
-              {step > s.n ? '✓' : s.icon}
+              {step > s.n ? <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg> : icons[s.n]}
             </div>
             <span style={{
               fontSize: '0.68rem',
@@ -106,9 +111,23 @@ function ProcessingOverlay({ message, stages }) {
     }}>
       {/* Animated rings */}
       <div style={{ position: 'relative', width: 100, height: 100 }}>
-        <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '3px solid rgba(79,70,229,0.3)', borderTopColor: '#6366F1', animation: 'spin 0.9s linear infinite' }} />
-        <div style={{ position: 'absolute', inset: 12, borderRadius: '50%', border: '3px solid rgba(124,58,237,0.2)', borderTopColor: '#8B5CF6', animation: 'spin 1.4s linear infinite reverse' }} />
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.8rem' }}>🤖</div>
+        <div style={{
+          position: 'absolute', inset: 0, borderRadius: '50%',
+          border: '3px solid rgba(79,70,229,0.3)',
+          borderTopColor: '#6366F1',
+          animation: 'spin 1s linear infinite',
+        }} />
+        <div style={{
+          position: 'absolute', inset: 12, borderRadius: '50%',
+          border: '3px solid rgba(124,58,237,0.2)',
+          borderTopColor: '#8B5CF6',
+          animation: 'spin 1.5s linear infinite reverse',
+        }} />
+        <div style={{
+          position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <svg width="32" height="32" fill="none" viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1.07A7 7 0 0 1 14 23h-4a7 7 0 0 1-6.93-4H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73A2 2 0 0 1 12 2z" stroke="#818CF8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><circle cx="9" cy="14" r="1.5" fill="#818CF8"/><circle cx="15" cy="14" r="1.5" fill="#818CF8"/><path d="M9 18h6" stroke="#818CF8" strokeWidth="1.5" strokeLinecap="round"/></svg>
+        </div>
       </div>
 
       {/* Title */}
@@ -278,7 +297,7 @@ export default function App({ onHome }) {
               fontSize: '1.2rem',
               boxShadow: '0 0 20px rgba(79,70,229,0.45)',
             }}>
-              ⚖️
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 3v18M3 7l9-4 9 4M5 7v4a7 7 0 0 0 4.5 6.5M19 7v4a7 7 0 0 1-4.5 6.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </div>
             <div style={{ textAlign: 'left' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -306,9 +325,9 @@ export default function App({ onHome }) {
             {serverHealth && serverHealth.matching_provider && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(56,189,248,0.1)', border: '1px solid rgba(56,189,248,0.3)', borderRadius: 8, padding: '4px 10px' }}>
                 <span style={{ color: '#38bdf8', fontSize: '0.7rem', fontWeight: 600 }}>
-                  {serverHealth.matching_provider === 'gemini' ? '☁️ Gemini' : 
-                   serverHealth.matching_provider === 'groq' ? '⚡ Groq' : 
-                   '🖥️ Ollama'} · {serverHealth.matching_model}
+                  {serverHealth.matching_provider === 'gemini' ? 'Gemini' : 
+                   serverHealth.matching_provider === 'groq' ? 'Groq' : 
+                   'Ollama'} · {serverHealth.matching_model}
                 </span>
               </div>
             )}
@@ -326,7 +345,7 @@ export default function App({ onHome }) {
         {step === 1 && (
           <div style={{ textAlign: 'center', marginBottom: 48 }} className="animate-fade-in">
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(79,70,229,0.1)', border: '1px solid rgba(79,70,229,0.25)', borderRadius: 9999, padding: '6px 16px', marginBottom: 20, fontSize: '0.78rem', color: '#a5b4fc', fontWeight: 600 }}>
-              🚀 Hackathon Demo · GeM Procurement AI
+              Hackathon Demo · GeM Procurement AI
             </div>
             <h1 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 800, color: '#f1f5f9', marginBottom: 16, lineHeight: 1.1, letterSpacing: '-0.03em', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               AI-Powered Bid{' '}
@@ -340,10 +359,10 @@ export default function App({ onHome }) {
             {/* Feature chips */}
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 48 }}>
               {[
-                { icon: '⚡', label: '2-min analysis' },
-                { icon: '🔍', label: 'Evidence-backed verdicts' },
-                { icon: '📊', label: 'Clause-by-clause audit' },
-                { icon: '📥', label: 'Exportable PDF report' },
+                { icon: <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, label: '2-min analysis' },
+                { icon: <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke="#94a3b8" strokeWidth="2"/><path d="M21 21l-4.35-4.35" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round"/></svg>, label: 'Evidence-backed verdicts' },
+                { icon: <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, label: 'Clause-by-clause audit' },
+                { icon: <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, label: 'Exportable PDF report' },
               ].map((f) => (
                 <div key={f.label} style={{ background: 'rgba(30,41,59,0.6)', border: '1px solid rgba(51,65,85,0.5)', borderRadius: 9999, padding: '6px 14px', fontSize: '0.78rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 6 }}>
                   {f.icon} {f.label}
@@ -361,7 +380,7 @@ export default function App({ onHome }) {
         {serverOk === false && (
           <AlertBanner
             type="warning"
-            message="⚠️ GEMINI_API_KEY is not configured on the backend. Add it to backend/.env and restart the server."
+            message="GEMINI_API_KEY is not configured on the backend. Add it to backend/.env and restart the server."
           />
         )}
 
@@ -378,7 +397,7 @@ export default function App({ onHome }) {
               <UploadCard
                 label="Drop your Tender / RFP PDF"
                 description="GeM tender, RFP, or bid notice document"
-                icon="📄"
+                icon={<svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="#818CF8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><polyline points="14 2 14 8 20 8" stroke="#818CF8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                 onFileSelect={setTenderFile}
                 file={tenderFile}
               />
@@ -396,12 +415,12 @@ export default function App({ onHome }) {
             {/* Info cards */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginTop: 24 }}>
               {[
-                { icon: '🔒', title: 'Secure', desc: 'Files processed in memory, never stored' },
-                { icon: '🤖', title: 'Gemini AI', desc: 'Powered by Google Gemini 2.0 Flash' },
-                { icon: '⚡', title: 'Fast', desc: 'Full analysis in under 2 minutes' },
+                { icon: <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#818CF8" strokeWidth="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#818CF8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, title: 'Secure', desc: 'Files processed in memory, never stored' },
+                { icon: <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1.07A7 7 0 0 1 14 23h-4a7 7 0 0 1-6.93-4H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73A2 2 0 0 1 12 2z" stroke="#818CF8" strokeWidth="1.5"/><circle cx="9" cy="14" r="1.5" fill="#818CF8"/><circle cx="15" cy="14" r="1.5" fill="#818CF8"/></svg>, title: 'AI-Powered', desc: 'Multi-provider LLM compliance engine' },
+                { icon: <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="#818CF8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, title: 'Fast', desc: 'Full analysis in under 2 minutes' },
               ].map((card) => (
                 <div key={card.title} className="glass-sm" style={{ padding: 16, textAlign: 'center' }}>
-                  <div style={{ fontSize: '1.4rem', marginBottom: 8 }}>{card.icon}</div>
+                  <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{card.icon}</div>
                   <div style={{ color: '#e2e8f0', fontWeight: 600, fontSize: '0.85rem', marginBottom: 4 }}>{card.title}</div>
                   <div style={{ color: '#64748b', fontSize: '0.73rem' }}>{card.desc}</div>
                 </div>
@@ -431,7 +450,7 @@ export default function App({ onHome }) {
                   <UploadCard
                     label="Drop Vendor Bid PDF"
                     description="Vendor proposal, technical + financial bid"
-                    icon="📋"
+                    icon={<svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" stroke="#818CF8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><rect x="8" y="2" width="8" height="4" rx="1" stroke="#818CF8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                     onFileSelect={setBidFile}
                     file={bidFile}
                   />
@@ -440,7 +459,7 @@ export default function App({ onHome }) {
                 {/* Summary of what will happen */}
                 <div className="glass-sm" style={{ padding: 20 }}>
                   <p style={{ color: '#94a3b8', fontSize: '0.78rem', marginBottom: 12, fontWeight: 600 }}>
-                    🤖 What the AI will do:
+                    What the AI will check:
                   </p>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {criteria.slice(0, 4).map((c, i) => (
@@ -463,7 +482,7 @@ export default function App({ onHome }) {
                   className="btn-primary"
                   style={{ width: '100%', justifyContent: 'center', fontSize: '1rem', padding: '14px 24px' }}
                 >
-                  🔍 Verify Compliance
+                  Verify Compliance
                 </button>
               </div>
             </div>
@@ -480,7 +499,7 @@ export default function App({ onHome }) {
                   Compliance Report
                 </h2>
                 <p style={{ color: '#64748b', fontSize: '0.8rem', margin: 0 }}>
-                  📄 {tenderFilename} &nbsp;·&nbsp; 📋 {bidFile?.name}
+                  {tenderFilename} &nbsp;·&nbsp; {bidFile?.name}
                 </p>
               </div>
               <ExportButton reportData={reportData} />
@@ -503,10 +522,35 @@ export default function App({ onHome }) {
               </div>
             </div>
 
+            {/* Provider info bar */}
+            {complianceData.matching_provider && (
+              <div className="glass-sm" style={{ marginTop: 20, padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#10B981', boxShadow: '0 0 6px #10B981' }} />
+                    <span style={{ color: '#94a3b8', fontSize: '0.73rem', fontWeight: 600 }}>
+                      Provider: <span style={{ color: '#e2e8f0' }}>{complianceData.matching_provider}</span>
+                    </span>
+                  </div>
+                  <span style={{ color: '#334155' }}>|</span>
+                  <span style={{ color: '#94a3b8', fontSize: '0.73rem', fontWeight: 600 }}>
+                    Model: <span style={{ color: '#e2e8f0' }}>{complianceData.matching_model}</span>
+                  </span>
+                  <span style={{ color: '#334155' }}>|</span>
+                  <span style={{ color: '#94a3b8', fontSize: '0.73rem', fontWeight: 600 }}>
+                    Pages: <span style={{ color: '#e2e8f0' }}>{complianceData.bid_num_pages}</span>
+                  </span>
+                </div>
+                <span style={{ color: '#475569', fontSize: '0.68rem', fontStyle: 'italic' }}>
+                  AI analysis is indicative — review by a qualified procurement officer is recommended.
+                </span>
+              </div>
+            )}
+
             {/* Footer note */}
-            <div style={{ marginTop: 20, textAlign: 'center' }}>
+            <div style={{ marginTop: 12, textAlign: 'center' }}>
               <p style={{ color: '#334155', fontSize: '0.72rem' }}>
-                This report was generated by AI and should be reviewed by a qualified procurement officer. AI analysis is indicative, not legally binding.
+                GeM BidVerify · Hackathon 2026
               </p>
             </div>
           </div>
