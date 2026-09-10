@@ -1,7 +1,7 @@
 'use strict';
 
 const { GoogleGenAI } = require('@google/genai');
-const { EXTRACTION_MODEL, MATCHING_MODEL } = require('../config/models');
+const { EXTRACTION_MODEL, GEMINI_MATCHING_MODEL } = require('../config/models');
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -185,19 +185,11 @@ For "evidence": copy a short verbatim passage (max 120 characters) directly from
 that supports your verdict. If you cannot find a relevant passage, return an empty string "".
 Do NOT paraphrase or invent evidence.`;
 
-  // ── DIAGNOSTIC: verify bid PDF data reaching this function ──────────────
-  const b64Data = bidPdfBuffer ? bidPdfBuffer.toString('base64') : '';
-  console.log(`  [DIAG] matchCriterion called for criterion_id=${criterion.id}`);
-  console.log(`  [DIAG]   bidPdfBuffer: type=${typeof bidPdfBuffer}, isBuffer=${Buffer.isBuffer(bidPdfBuffer)}, length=${bidPdfBuffer ? bidPdfBuffer.length : 'NULL'} bytes`);
-  console.log(`  [DIAG]   base64 length: ${b64Data.length} chars`);
-  console.log(`  [DIAG]   bidRawText length: ${bidRawText ? bidRawText.length : 'NULL'} chars`);
-  console.log(`  [DIAG]   model: ${MATCHING_MODEL}`);
-
   let rawResult;
   try {
     rawResult = await withRetry(async () => {
       const response = await ai.models.generateContent({
-        model: MATCHING_MODEL,
+        model: GEMINI_MATCHING_MODEL,
         contents: [
           {
             role: 'user',
@@ -212,24 +204,16 @@ Do NOT paraphrase or invent evidence.`;
           responseSchema: MATCH_SCHEMA,
         },
       });
-
-      // ── DIAGNOSTIC: raw model response for first criterion only ──────────
-      if (criterion.id === 1) {
-        console.log(`  [DIAG] RAW RESPONSE (criterion 1): ${response.text}`);
-      }
-
       return JSON.parse(response.text);
     });
   } catch (err) {
-    // ── DIAGNOSTIC: log the ACTUAL error that caused fallback ───────────────
-    console.error(`  [DIAG] ❌ CATCH BLOCK HIT for "${criterion.criterion}": ${err.message}`);
-    console.error(`  [DIAG]   Error name: ${err.name}, status: ${err.status || 'N/A'}`);
+    console.error(`  [gemini] ❌ Matching failed for "${criterion.criterion}": ${err.message}`);
     return {
       criterion_id:        criterion.id,
       verdict:             'Not Found',
       evidence:            '',
       confidence:          0,
-      reason:              `Analysis could not be completed after retries: ${err.message}`,
+      reason:              `Gemini API error: ${err.message}`,
       hallucination_check: 'error',
     };
   }
@@ -258,4 +242,4 @@ Do NOT paraphrase or invent evidence.`;
   };
 }
 
-module.exports = { extractCriteria, matchCriterion };
+module.exports = { extractCriteria, matchCriterion, runHallucinationGuard };

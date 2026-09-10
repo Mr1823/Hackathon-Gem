@@ -6,8 +6,10 @@ const cors    = require('cors');
 const multer  = require('multer');
 
 const { extractCriteria, matchCriterion }  = require('./services/geminiService');
-const { extractTextFromPDF }               = require('./services/pdfService');   // used ONLY for hallucination guard
+const { matchCriterionOpenAI }             = require('./services/openaiMatchingService');
+const { extractTextFromPDF }               = require('./services/pdfService');
 const { generateComplianceReport }         = require('./services/reportService');
+const config                               = require('./config/models');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
@@ -26,13 +28,27 @@ const upload = multer({
   },
 });
 
+// ── Helper: resolve active matching model name for display ────────────────────
+function getMatchingModelName() {
+  switch (config.MATCHING_PROVIDER) {
+    case 'gemini': return config.GEMINI_MATCHING_MODEL;
+    case 'groq':   return config.GROQ_MODEL;
+    case 'ollama': return config.OLLAMA_MODEL;
+    default:       return 'unknown';
+  }
+}
+
 // ── Health ────────────────────────────────────────────────────────────────────
 app.get('/api/health', (_req, res) => {
-  const { EXTRACTION_MODEL, MATCHING_MODEL } = require('./config/models');
   res.json({
     status: 'ok',
-    gemini_configured: !!process.env.GEMINI_API_KEY,
-    models: { extraction: EXTRACTION_MODEL, matching: MATCHING_MODEL },
+    gemini_configured:  !!process.env.GEMINI_API_KEY,
+    matching_provider:  config.MATCHING_PROVIDER,
+    matching_model:     getMatchingModelName(),
+    models: {
+      extraction: config.EXTRACTION_MODEL,
+      matching:   `${config.MATCHING_PROVIDER}/${getMatchingModelName()}`,
+    },
     timestamp: new Date().toISOString(),
   });
 });
@@ -66,10 +82,12 @@ app.post('/api/upload-tender', upload.single('tender'), async (req, res) => {
 // ── POST /api/verify-compliance ───────────────────────────────────────────────
 // Receives a Bid PDF + criteria JSON → runs per-criterion matching with hallucination guard.
 //
-// Pipeline:
-//   1. Extract bid raw text (pdf-parse) — used ONLY for the hallucination guard.
-//   2. For each criterion: pass the bid PDF natively to Gemini and get verdict+evidence.
-//   3. Gemini service internally verifies evidence against raw text; downgrades if not found.
+// Provider routing:
+//   gemini → native PDF to Gemini API (geminiService.matchCriterion)
+//   groq   → pdf-parse text to Groq API (openaiMatchingService.matchCriterionOpenAI)
+//   ollama → pdf-parse text to local Ollama (openaiMatchingService.matchCriterionOpenAI)
+//
+// The hallucination guard runs after ALL providers — it only needs the raw text and the evidence string.
 app.post('/api/verify-compliance', upload.single('bid'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No bid PDF uploaded' });
@@ -84,22 +102,50 @@ app.post('/api/verify-compliance', upload.single('bid'), async (req, res) => {
       return res.status(400).json({ error: 'No criteria provided' });
     }
 
-    console.log(`[Compliance] ${req.file.originalname}  ${(req.file.size / 1024).toFixed(0)} KB`);
+    const provider = config.MATCHING_PROVIDER;
+    console.log(`[Compliance] ${req.file.originalname}  ${(req.file.size / 1024).toFixed(0)} KB  provider=${provider}`);
 
-    // Step 1: Extract raw text once — ONLY for the hallucination guard inside matchCriterion.
-    // If extraction fails, pdfService returns empty string; guard degrades conservatively (safe).
+    // Step 1: Extract raw text from bid PDF.
+    // - For groq/ollama: this IS the bid content sent to the model (they don't accept native PDF).
+    // - For gemini: used ONLY for the hallucination guard (Gemini gets the native PDF).
     const { text: bidRawText, numPages } = await extractTextFromPDF(req.file.buffer);
     if (bidRawText.length === 0) {
-      console.warn('[Compliance] Raw text extraction returned empty — hallucination guard in degraded mode (all evidence unverifiable).');
+      if (provider === 'groq' || provider === 'ollama') {
+        console.error('[Compliance] ❌ pdf-parse returned empty text — cannot use text-based provider without bid content.');
+        return res.status(422).json({
+          error: `PDF text extraction failed (empty output). The ${provider} provider requires readable text. Try a different PDF or switch to MATCHING_PROVIDER=gemini which can read native PDFs.`,
+        });
+      }
+      console.warn('[Compliance] Raw text extraction returned empty — hallucination guard in degraded mode.');
     } else {
       console.log(`[Compliance] Raw text extracted: ${bidRawText.length} chars across ${numPages} pages`);
     }
 
-    // Step 2: Sequential criterion matching (sequential = more reliable JSON output)
+    // Step 2: Sequential criterion matching — dispatch to active provider
     const results = [];
     for (const criterion of criteria) {
       console.log(`  → ${criterion.criterion}`);
-      const result = await matchCriterion(criterion, req.file.buffer, bidRawText);
+
+      let result;
+      if (provider === 'gemini') {
+        result = await matchCriterion(criterion, req.file.buffer, bidRawText);
+      } else {
+        // groq or ollama — text-based matching via OpenAI SDK
+        result = await matchCriterionOpenAI(criterion, bidRawText, provider);
+
+        // Run hallucination guard on the result (same as Gemini path)
+        const { runHallucinationGuard } = require('./services/geminiService');
+        const guardResult = runHallucinationGuard(result.evidence || '', bidRawText);
+        if (guardResult === 'failed') {
+          console.warn(`  ⚠  Hallucination guard FAILED for "${criterion.criterion}" — downgrading.`);
+          result.verdict             = 'Not Found';
+          result.evidence            = '';
+          result.reason             += ' (Evidence snippet could not be verified in the source document.)';
+          result.confidence          = Math.min(result.confidence, 40);
+        }
+        result.hallucination_check = guardResult;
+      }
+
       console.log(`     ${result.verdict}  confidence=${result.confidence}  guard=${result.hallucination_check}`);
       results.push(result);
     }
@@ -113,9 +159,11 @@ app.post('/api/verify-compliance', upload.single('bid'), async (req, res) => {
     console.log(`[Compliance] ✓ Score: ${score}%  (${compliantCount} compliant / ${nonCompliantCount} non-compliant / ${notFoundCount} not found)`);
 
     res.json({
-      success:           true,
-      bid_filename:      req.file.originalname,
-      bid_num_pages:     numPages,
+      success:             true,
+      bid_filename:        req.file.originalname,
+      bid_num_pages:       numPages,
+      matching_provider:   provider,
+      matching_model:      getMatchingModelName(),
       score,
       compliant_count:     compliantCount,
       non_compliant_count: nonCompliantCount,
@@ -155,15 +203,26 @@ app.use((err, _req, res, _next) => {
 });
 
 // ── Start ─────────────────────────────────────────────────────────────────────
-const { EXTRACTION_MODEL, MATCHING_MODEL } = require('./config/models');
+const providerLabel = {
+  gemini: '☁️  Gemini API',
+  groq:   '⚡ Groq Cloud',
+  ollama: '🖥️  Ollama Local',
+};
+
 app.listen(PORT, () => {
+  const p = config.MATCHING_PROVIDER;
   console.log(`
-╔══════════════════════════════════════════════════════╗
-║   GeM AI Bid Compliance Verification Backend         ║
-║   http://localhost:${PORT}                              ║
-║   Gemini API : ${process.env.GEMINI_API_KEY ? '✓ Configured' : '✗ NOT SET — add to .env'}                  ║
-║   Extraction : ${EXTRACTION_MODEL.padEnd(22)}      ║
-║   Matching   : ${MATCHING_MODEL.padEnd(22)}      ║
-╚══════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════╗
+║   GeM AI Bid Compliance Verification Backend             ║
+║   http://localhost:${PORT}                                  ║
+║                                                          ║
+║   Extraction : ${config.EXTRACTION_MODEL.padEnd(25)}     ║
+║   Matching   : ${(providerLabel[p] || p).padEnd(25)}     ║
+║                ${getMatchingModelName().padEnd(25)}     ║
+║                                                          ║
+║   Gemini Key : ${process.env.GEMINI_API_KEY ? '✓ Configured' : '✗ NOT SET'}                        ║
+║   Groq Key   : ${process.env.GROQ_API_KEY ? '✓ Configured' : '— not set'}                        ║
+║   Ollama URL : ${config.OLLAMA_BASE_URL.padEnd(25)}     ║
+╚══════════════════════════════════════════════════════════════╝
   `);
 });

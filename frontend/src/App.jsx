@@ -157,12 +157,19 @@ export default function App() {
   const [loadingSubMsg, setLoadingSubMsg] = useState('');
   const [error, setError] = useState('');
   const [serverOk, setServerOk] = useState(null);
+  const [serverHealth, setServerHealth] = useState(null);
 
   // Health check on mount
   useEffect(() => {
     checkHealth()
-      .then((h) => setServerOk(h.gemini_configured))
-      .catch(() => setServerOk(false));
+      .then((h) => {
+        setServerOk(h.gemini_configured);
+        setServerHealth(h);
+      })
+      .catch(() => {
+        setServerOk(false);
+        setServerHealth(null);
+      });
   }, []);
 
   const handleTenderUpload = async () => {
@@ -265,6 +272,15 @@ export default function App() {
                 <div style={{ width: 7, height: 7, borderRadius: '50%', background: serverOk ? '#10B981' : '#EF4444', boxShadow: `0 0 6px ${serverOk ? '#10B981' : '#EF4444'}`, animation: 'pulse 2s infinite' }} />
                 <span style={{ color: serverOk ? '#34d399' : '#f87171', fontSize: '0.7rem', fontWeight: 600 }}>
                   {serverOk ? 'AI Ready' : 'API Key Missing'}
+                </span>
+              </div>
+            )}
+            {serverHealth && serverHealth.matching_provider && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(56,189,248,0.1)', border: '1px solid rgba(56,189,248,0.3)', borderRadius: 8, padding: '4px 10px' }}>
+                <span style={{ color: '#38bdf8', fontSize: '0.7rem', fontWeight: 600 }}>
+                  {serverHealth.matching_provider === 'gemini' ? '☁️ Gemini' : 
+                   serverHealth.matching_provider === 'groq' ? '⚡ Groq' : 
+                   '🖥️ Ollama'} · {serverHealth.matching_model}
                 </span>
               </div>
             )}

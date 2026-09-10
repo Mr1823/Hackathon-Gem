@@ -1,9 +1,14 @@
-const pdfParse = require('pdf-parse');
+'use strict';
 
 /**
  * Extract plain text from a PDF buffer.
- * Used ONLY for the hallucination guard in geminiService — the LLM itself
- * receives the PDF natively and does not depend on this output.
+ * 
+ * Uses pdfjs-dist (modern Mozilla PDF.js) directly instead of the pdf-parse
+ * wrapper, which bundles an ancient version that crashes on many real-world PDFs.
+ *
+ * Used for:
+ *   - Hallucination guard (all providers)
+ *   - Bid content input for text-based providers (Groq, Ollama)
  *
  * @param  {Buffer} buffer
  * @returns {Promise<{text: string, numPages: number}>}
@@ -11,15 +16,28 @@ const pdfParse = require('pdf-parse');
  */
 async function extractTextFromPDF(buffer) {
   try {
-    const data = await pdfParse(buffer);
+    // Dynamic import — pdfjs-dist is ESM-only in v4+
+    const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
+
+    const uint8 = new Uint8Array(buffer);
+    const doc = await pdfjsLib.getDocument({ data: uint8 }).promise;
+
+    const textParts = [];
+    for (let i = 1; i <= doc.numPages; i++) {
+      const page = await doc.getPage(i);
+      const content = await page.getTextContent();
+      const pageText = content.items.map(item => item.str).join(' ');
+      textParts.push(pageText);
+    }
+
+    const fullText = textParts.join('\n\n');
+    console.log(`[pdfService] Extracted ${fullText.length} chars from ${doc.numPages} pages`);
+
     return {
-      text:     data.text     || '',
-      numPages: data.numpages || 0,
+      text:     fullText,
+      numPages: doc.numPages,
     };
   } catch (error) {
-    // Graceful degradation: if text extraction fails (e.g. encrypted / unusual encoding),
-    // return empty text. The hallucination guard in geminiService will then treat every
-    // evidence snippet as "unverifiable" and downgrade to "Not Found" — a safe conservative stance.
     console.warn(`[pdfService] Text extraction warning (guard degraded): ${error.message}`);
     return { text: '', numPages: 0 };
   }
