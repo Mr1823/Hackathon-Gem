@@ -1,8 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
+
+
 
 @theme {
   --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
 
   --color-gem-50: #EEF2FF;
   --color-gem-100: #E0E7FF;
@@ -82,12 +85,15 @@ body {
 
 /* Glass card */
 .glass {
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(100, 116, 139, 0.2);
+  background: rgba(12, 20, 38, 0.65);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(100, 116, 139, 0.18);
   border-radius: 16px;
-  box-shadow: 0 0 0 1px rgba(255,255,255,0.04) inset, 0 8px 32px rgba(0,0,0,0.4);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.05) inset,
+    0 8px 32px rgba(0,0,0,0.45),
+    0 2px 4px rgba(0,0,0,0.3);
 }
 
 .glass-sm {
@@ -117,15 +123,30 @@ body {
   border-radius: 12px;
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
   box-shadow: 0 4px 20px rgba(79, 70, 229, 0.3);
   font-size: 0.9rem;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+  background-size: 200% 100%;
+  background-position: -200% 0;
+  transition: background-position 0.5s ease;
+}
+
+.btn-primary:hover:not(:disabled)::after {
+  background-position: 200% 0;
 }
 
 .btn-primary:hover:not(:disabled) {
   background: linear-gradient(135deg, #4338CA, #6D28D9);
-  box-shadow: 0 4px 24px rgba(79, 70, 229, 0.5);
-  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 6px 28px rgba(79, 70, 229, 0.55);
+  transform: translateY(-2px) scale(1.02);
 }
 
 .btn-primary:active:not(:disabled) {
@@ -135,6 +156,11 @@ body {
 .btn-primary:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.btn-primary:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 3px;
 }
 
 .btn-secondary {
@@ -303,3 +329,20 @@ body {
   height: 2px;
   background: linear-gradient(90deg, rgba(79,70,229,0.5), transparent);
 }
+
+/* Secondary button focus */
+.btn-secondary:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 3px;
+}
+
+/* Responsive helpers */
+@media (max-width: 768px) {
+  .glass {
+    border-radius: 12px;
+  }
+  .glass-sm {
+    border-radius: 10px;
+  }
+}
+

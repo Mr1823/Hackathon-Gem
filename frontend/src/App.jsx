@@ -71,46 +71,70 @@ function StepIndicator({ step }) {
   );
 }
 
-// ── Processing Overlay ────────────────────────────────────────────────────────
-function ProcessingOverlay({ message, subMessage }) {
+// ── Processing Overlay ─────────────────────────────────────────────────────────
+const TENDER_STAGES = [
+  { label: 'Reading PDF', sub: 'Parsing document structure…' },
+  { label: 'Identifying Criteria', sub: 'Locating eligibility clauses…' },
+  { label: 'Structuring Checklist', sub: 'Building JSON criteria list…' },
+];
+const BID_STAGES = [
+  { label: 'Sending Bid to AI', sub: 'Uploading document for analysis…' },
+  { label: 'Matching Criteria', sub: 'Checking each clause against the bid…' },
+  { label: 'Generating Report', sub: 'Computing scores and evidence…' },
+];
+
+function ProcessingOverlay({ message, stages }) {
+  const [activeStage, setActiveStage] = useState(0);
+
+  useEffect(() => {
+    setActiveStage(0);
+    const t1 = setTimeout(() => setActiveStage(1), 5000);
+    const t2 = setTimeout(() => setActiveStage(2), 14000);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, [message]);
+
+  const stageList = stages || TENDER_STAGES;
+
   return (
     <div style={{
       position: 'fixed', inset: 0,
-      background: 'rgba(2,6,23,0.85)',
-      backdropFilter: 'blur(8px)',
+      background: 'rgba(2,6,23,0.88)',
+      backdropFilter: 'blur(12px)',
       display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center',
-      zIndex: 1000,
-      gap: 20,
+      zIndex: 1000, gap: 28,
     }}>
       {/* Animated rings */}
       <div style={{ position: 'relative', width: 100, height: 100 }}>
-        <div style={{
-          position: 'absolute', inset: 0, borderRadius: '50%',
-          border: '3px solid rgba(79,70,229,0.3)',
-          borderTopColor: '#6366F1',
-          animation: 'spin 1s linear infinite',
-        }} />
-        <div style={{
-          position: 'absolute', inset: 12, borderRadius: '50%',
-          border: '3px solid rgba(124,58,237,0.2)',
-          borderTopColor: '#8B5CF6',
-          animation: 'spin 1.5s linear infinite reverse',
-        }} />
-        <div style={{
-          position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '1.8rem',
-        }}>
-          🤖
-        </div>
+        <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '3px solid rgba(79,70,229,0.3)', borderTopColor: '#6366F1', animation: 'spin 0.9s linear infinite' }} />
+        <div style={{ position: 'absolute', inset: 12, borderRadius: '50%', border: '3px solid rgba(124,58,237,0.2)', borderTopColor: '#8B5CF6', animation: 'spin 1.4s linear infinite reverse' }} />
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.8rem' }}>🤖</div>
       </div>
+
+      {/* Title */}
       <div style={{ textAlign: 'center' }}>
-        <p style={{ color: '#e2e8f0', fontWeight: 700, fontSize: '1.1rem', margin: 0, marginBottom: 6 }}>
-          {message}
-        </p>
-        <p style={{ color: '#64748b', fontSize: '0.8rem', margin: 0 }}>
-          {subMessage}
-        </p>
+        <p style={{ color: '#e2e8f0', fontWeight: 700, fontSize: '1.15rem', margin: '0 0 4px', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{message}</p>
+        <p style={{ color: '#475569', fontSize: '0.78rem', margin: 0 }}>This may take 15–60 seconds</p>
+      </div>
+
+      {/* Stage indicators */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: 'min(360px, 90vw)' }}>
+        {stageList.map((s, i) => {
+          const done = i < activeStage;
+          const active = i === activeStage;
+          return (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', borderRadius: 10, background: active ? 'rgba(79,70,229,0.12)' : done ? 'rgba(16,185,129,0.07)' : 'rgba(30,41,59,0.4)', border: `1px solid ${active ? 'rgba(79,70,229,0.3)' : done ? 'rgba(16,185,129,0.2)' : 'rgba(51,65,85,0.4)'}`, transition: 'all 0.4s ease' }}>
+              <div style={{ width: 20, height: 20, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 800, background: done ? 'rgba(16,185,129,0.2)' : active ? 'rgba(79,70,229,0.2)' : 'rgba(51,65,85,0.5)', color: done ? '#34d399' : active ? '#a5b4fc' : '#475569', border: `1.5px solid ${done ? 'rgba(16,185,129,0.4)' : active ? 'rgba(79,70,229,0.4)' : 'rgba(51,65,85,0.4)'}` }}>
+                {done ? '✓' : i + 1}
+              </div>
+              <div>
+                <p style={{ color: done ? '#34d399' : active ? '#e2e8f0' : '#475569', fontWeight: 600, fontSize: '0.82rem', margin: 0, transition: 'color 0.3s' }}>{s.label}</p>
+                {active && <p style={{ color: '#64748b', fontSize: '0.72rem', margin: 0 }}>{s.sub}</p>}
+              </div>
+              {active && <div style={{ marginLeft: 'auto', width: 14, height: 14, borderRadius: '50%', border: '2px solid rgba(99,102,241,0.3)', borderTopColor: '#6366f1', animation: 'spin 0.8s linear infinite', flexShrink: 0 }} />}
+            </div>
+          );
+        })}
       </div>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
@@ -144,7 +168,7 @@ function AlertBanner({ type, message, onDismiss }) {
 }
 
 // ── Main App ──────────────────────────────────────────────────────────────────
-export default function App() {
+export default function App({ onHome }) {
   const [step, setStep] = useState(1);
   const [tenderFile, setTenderFile] = useState(null);
   const [bidFile, setBidFile] = useState(null);
@@ -154,7 +178,7 @@ export default function App() {
   const [complianceData, setComplianceData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState('');
-  const [loadingSubMsg, setLoadingSubMsg] = useState('');
+  const [loadingStages, setLoadingStages] = useState(null);
   const [error, setError] = useState('');
   const [serverOk, setServerOk] = useState(null);
   const [serverHealth, setServerHealth] = useState(null);
@@ -177,7 +201,7 @@ export default function App() {
     setError('');
     setLoading(true);
     setLoadingMsg('Analyzing Tender Document...');
-    setLoadingSubMsg('AI is extracting eligibility criteria from the RFP. This takes ~15–30 seconds.');
+    setLoadingStages(TENDER_STAGES);
     try {
       const data = await uploadTender(tenderFile);
       setCriteria(data.criteria);
@@ -196,7 +220,7 @@ export default function App() {
     setError('');
     setLoading(true);
     setLoadingMsg('Verifying Bid Compliance...');
-    setLoadingSubMsg(`Checking ${criteria.length} criteria against bid document. Each criterion is individually analyzed...`);
+    setLoadingStages(BID_STAGES);
     try {
       const data = await verifyCompliance(bidFile, criteria);
       setComplianceData(data);
@@ -230,7 +254,7 @@ export default function App() {
 
   return (
     <div style={{ minHeight: '100vh', padding: '0 0 60px' }}>
-      {loading && <ProcessingOverlay message={loadingMsg} subMessage={loadingSubMsg} />}
+      {loading && <ProcessingOverlay message={loadingMsg} stages={loadingStages} />}
 
       {/* ── Header ── */}
       <header style={{
@@ -241,20 +265,24 @@ export default function App() {
         padding: '0 24px',
       }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <button
+            onClick={onHome}
+            style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'none', border: 'none', cursor: onHome ? 'pointer' : 'default', padding: 0 }}
+            title="Back to home"
+          >
             <div style={{
               width: 38, height: 38,
               background: 'linear-gradient(135deg, #4F46E5, #7C3AED)',
               borderRadius: 10,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: '1.2rem',
-              boxShadow: '0 0 16px rgba(79,70,229,0.4)',
+              boxShadow: '0 0 20px rgba(79,70,229,0.45)',
             }}>
               ⚖️
             </div>
-            <div>
+            <div style={{ textAlign: 'left' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ color: '#e2e8f0', fontWeight: 800, fontSize: '1rem', letterSpacing: '-0.01em' }}>
+                <span style={{ color: '#e2e8f0', fontWeight: 800, fontSize: '1rem', letterSpacing: '-0.01em', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                   GeM BidVerify
                 </span>
                 <span style={{ background: 'rgba(79,70,229,0.2)', border: '1px solid rgba(79,70,229,0.35)', color: '#818cf8', fontSize: '0.6rem', padding: '1px 8px', borderRadius: 9999, fontWeight: 700, letterSpacing: '0.08em' }}>
@@ -265,7 +293,7 @@ export default function App() {
                 Government e-Marketplace · Bid Compliance Verification
               </p>
             </div>
-          </div>
+          </button>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             {serverOk !== null && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: serverOk ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)', border: `1px solid ${serverOk ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}`, borderRadius: 8, padding: '4px 10px' }}>
@@ -300,7 +328,7 @@ export default function App() {
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(79,70,229,0.1)', border: '1px solid rgba(79,70,229,0.25)', borderRadius: 9999, padding: '6px 16px', marginBottom: 20, fontSize: '0.78rem', color: '#a5b4fc', fontWeight: 600 }}>
               🚀 Hackathon Demo · GeM Procurement AI
             </div>
-            <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', fontWeight: 900, color: '#f1f5f9', marginBottom: 16, lineHeight: 1.15, letterSpacing: '-0.02em' }}>
+            <h1 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 800, color: '#f1f5f9', marginBottom: 16, lineHeight: 1.1, letterSpacing: '-0.03em', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               AI-Powered Bid{' '}
               <span className="gradient-text">Compliance Verification</span>
             </h1>
